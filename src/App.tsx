@@ -1,13 +1,8 @@
-import "./index.css";
-import "./App.css";
-import Test from "./components/Test";
+import "@/index.css";
+import NewsPage from "@/pages/NewsPage";
 
 function App() {
-  return (
-    <>
-      <Test />
-    </>
-  );
+  return <NewsPage />;
 }
 
 export default App;
