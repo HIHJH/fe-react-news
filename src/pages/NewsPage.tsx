@@ -1,17 +1,13 @@
-import Header from "@/news-stand/components/Header";
-import RollingNews from "@/news-stand/components/rolling-news/RollingNews";
+import NewsPageLayout from "@/layout/NewsPageLayout";
+import NewsContents from "@/features/news-contents/NewsContents";
+import RollingNews from "@/features/rolling-news/RollingNews";
 
 const NewsPage = () => {
   return (
-    <>
-      <div className="flex flex-col items-center pt-20">
-        <div className="flex flex-col gap-8 w-[930px]">
-          <Header />
-          <RollingNews />
-          {/* <NewsContents /> 추가 */}
-        </div>
-      </div>
-    </>
+    <NewsPageLayout>
+      <RollingNews />
+      <NewsContents />
+    </NewsPageLayout>
   );
 };
 
