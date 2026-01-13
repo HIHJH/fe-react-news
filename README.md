@@ -17,27 +17,29 @@
 ## 목표
 
 - 상태 관리 다양한 방법으로 해보기 + 장단점 비교
+- API 연결 및 데이터 관리 방법 고민하기
 - 유지 보수가 쉬운 코드 작성하기
 - 불필요한 리렌더링 줄이기
+- 타입 잘 관리하기
 
 ## 폴더 구조
 
 ```
 src/
+├── api/                 # API 연결 및 쿼리키 관리
 ├── assets/              # 정적 리소스
-├── services/            # API 연결
 ├── shared/              # 여러 기능이 공통으로 사용하는 코드
 │   ├── components/      # 공통 UI 컴포넌트 (Button, Input, Card 등)
 │   ├── hooks/           # 공통 커스텀 훅
 │   ├── types/           # 공통 타입 정의
 │   └── utils/           # 공통 유틸리티 함수
-├── 기능 단위/
-│   ├── components/
-│   ├── hooks/
-│   └── utils/
+├── features/
+│   └── 기능 단위/
+│       └── components/
+│       ├── hooks/
+│       └── utils/
 ├── pages/               # 페이지 컴포넌트
 │   └── NewsPage.tsx
-├── store/               # 전역 상태 관리
 ├── App.tsx
 └── main.tsx
 ```
