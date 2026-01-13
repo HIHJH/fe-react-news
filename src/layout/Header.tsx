@@ -1,4 +1,4 @@
-import { formatDateWithDay } from "@/news-stand/utils/formatDate";
+import { formatDateWithDay } from "@/utils/formatDate";
 import logo from "@/assets/icons/logo.svg";
 
 const Header = () => {
