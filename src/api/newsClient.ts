@@ -4,7 +4,7 @@ import type { paths } from "./api";
 
 // axios 인스턴스 생성
 const API_BASE_URL = "https://news-worker.forhyundaisofteer.workers.dev";
-const apiClient: AxiosInstance = axios.create({
+const newsClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
@@ -41,18 +41,12 @@ type DeleteResponse<T extends keyof paths> = paths[T]["delete"] extends {
   ? R
   : never;
 
-// Path 파라미터 타입 추출 헬퍼
-type PathParams<
-  T extends keyof paths,
-  M extends "get" | "post" | "delete"
-> = paths[T][M] extends { parameters: { path: infer P } } ? P : never;
-
 /**
  * /api/newsstand - 모든 언론사 정보 조회
  */
 export async function getNewsstand(): Promise<GetResponse<"/api/newsstand">> {
   const response: AxiosResponse<GetResponse<"/api/newsstand">> =
-    await apiClient.get<GetResponse<"/api/newsstand">>("/api/newsstand");
+    await newsClient.get<GetResponse<"/api/newsstand">>("/api/newsstand");
 
   return response.data;
 }
@@ -64,7 +58,7 @@ export async function getNewsstandPress(
   pid: string
 ): Promise<GetResponse<"/api/newsstand/{pid}">> {
   const response: AxiosResponse<GetResponse<"/api/newsstand/{pid}">> =
-    await apiClient.get<GetResponse<"/api/newsstand/{pid}">>(
+    await newsClient.get<GetResponse<"/api/newsstand/{pid}">>(
       `/api/newsstand/${pid}`
     );
   return response.data;
@@ -77,7 +71,7 @@ export async function getSubscriptions(): Promise<
   GetResponse<"/api/subscribe">
 > {
   const response: AxiosResponse<GetResponse<"/api/subscribe">> =
-    await apiClient.get<GetResponse<"/api/subscribe">>("/api/subscribe");
+    await newsClient.get<GetResponse<"/api/subscribe">>("/api/subscribe");
 
   return response.data;
 }
@@ -89,7 +83,7 @@ export async function addSubscription(
   pid: string
 ): Promise<PostResponse<"/api/subscribe/{pid}">> {
   const response: AxiosResponse<PostResponse<"/api/subscribe/{pid}">> =
-    await apiClient.post<PostResponse<"/api/subscribe/{pid}">>(
+    await newsClient.post<PostResponse<"/api/subscribe/{pid}">>(
       `/api/subscribe/${pid}`
     );
   return response.data;
@@ -102,7 +96,7 @@ export async function removeSubscription(
   pid: string
 ): Promise<DeleteResponse<"/api/subscribe/{pid}">> {
   const response: AxiosResponse<DeleteResponse<"/api/subscribe/{pid}">> =
-    await apiClient.delete<DeleteResponse<"/api/subscribe/{pid}">>(
+    await newsClient.delete<DeleteResponse<"/api/subscribe/{pid}">>(
       `/api/subscribe/${pid}`
     );
   return response.data;
@@ -113,6 +107,6 @@ export async function removeSubscription(
  */
 export async function getRolling(): Promise<GetResponse<"/api/rolling">> {
   const response: AxiosResponse<GetResponse<"/api/rolling">> =
-    await apiClient.get<GetResponse<"/api/rolling">>("/api/rolling");
+    await newsClient.get<GetResponse<"/api/rolling">>("/api/rolling");
   return response.data;
 }
