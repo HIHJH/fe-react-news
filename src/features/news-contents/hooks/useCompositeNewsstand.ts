@@ -1,41 +1,94 @@
-import type { getNewsstand } from "@/api/newsClient";
 import { useNewsstand } from "@/features/news-contents/hooks/useNewsstand";
 import { useSubscription } from "@/features/news-contents/hooks/useSubscription";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type NewsstandData = Awaited<ReturnType<typeof getNewsstand>>;
+type GridItem = {
+  pid: string;
+  name: string;
+  logoLight: string;
+  logoDark: string;
+  isSubscribed: boolean;
+};
+export type NewsstandMapData = GridItem[];
 
+const MAX_ALL_GRID_ITEMS = 96;
+
+// [TODO] 수정 필요
 export const useCompositeNewsstand = () => {
-  const { data: subIdList, isLoading: isSubLoading } = useSubscription();
+  const { data: subData, isLoading: isSubLoading } = useSubscription();
   const { data: rawNewsData, isLoading: isNewsLoading } = useNewsstand();
 
-  const gridData = useMemo(() => {
-    if (!rawNewsData || !subIdList) return null;
-    return transformNewsstand(rawNewsData, subIdList.pids);
-  }, [rawNewsData, subIdList]);
+  const subPids = subData?.pids ?? [];
+
+  // 전체 그리드의 랜덤 순서는 rawNewsData가 바뀔 때만 새로 생성 (= 새로고침/재요청 시 랜덤)
+  const [allOrder, setAllOrder] = useState<string[]>([]);
+
+  useEffect(() => {
+    const blocks = rawNewsData?.blocks ?? [];
+    const pids = blocks.map((b) => b?.pid).filter(Boolean) as string[];
+    setAllOrder(shuffle(pids));
+  }, [rawNewsData]);
+
+  const { allGridData, subscribedGridData } = useMemo(() => {
+    if (!rawNewsData) {
+      return {
+        allGridData: null as GridItem[] | null,
+        subscribedGridData: null as GridItem[] | null,
+      };
+    }
+
+    const blocks = rawNewsData.blocks ?? [];
+    const subSet = new Set(subPids);
+
+    // pid -> 원본 아이템 맵
+    const byPid = new Map<string, any>();
+    for (const b of blocks) {
+      if (b?.pid) byPid.set(b.pid, b);
+    }
+
+    // 전체
+    // allOrder(셔플된 pid 순서) 유지 + 96개 제한
+    const all = (
+      allOrder.length ? allOrder : blocks.map((b) => b?.pid).filter(Boolean)
+    )
+      .map((pid) => byPid.get(pid ?? ""))
+      .filter(Boolean)
+      .slice(0, MAX_ALL_GRID_ITEMS)
+      .map((item) => toGridItem(item, subSet));
+
+    // 구독
+    // subPids 배열 순서 그대로 + 제한 없음(없는 pid는 제외)
+    const subscribed = subPids
+      .map((pid) => byPid.get(pid))
+      .filter(Boolean)
+      .map((item) => toGridItem(item, subSet));
+
+    return { allGridData: all, subscribedGridData: subscribed };
+  }, [rawNewsData, subPids, allOrder]);
 
   return {
-    data: gridData,
+    allGridData,
+    subscribedGridData,
     isLoading: isSubLoading || isNewsLoading,
   };
 };
 
-// 리스트인 경우는 96개만 뽑을 필요 없으니 리스트용 함수 만들거나 분리 필요
-const transformNewsstand = (data: NewsstandData, subIdList?: string[]) => {
-  // 구독 ID Set 생성
-  const subIdSet = subIdList ? new Set(subIdList) : new Set<string>();
+function shuffle<T>(arr: T[]) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-  // 랜덤 순으로 반환
-  const shuffled = data.blocks?.sort(() => 0.5 - Math.random());
-
-  return (
-    shuffled?.map((item) => ({
-      pid: item.pid,
-      name: item.name,
-      logoLight: item.logoLight?.url || "",
-      logoDark: item.logoDark?.url || "",
-      isSubscribed: subIdSet.has(item.pid ?? ""),
-    })) || []
-  );
+const toGridItem = (item: any, subSet: Set<string>): GridItem => {
+  const pid = item?.pid ?? "";
+  return {
+    pid,
+    name: item?.name ?? "",
+    logoLight: item?.logoLight?.url || "",
+    logoDark: item?.logoDark?.url || "",
+    isSubscribed: subSet.has(pid),
+  };
 };
-export type NewsstandMapData = ReturnType<typeof transformNewsstand>;
