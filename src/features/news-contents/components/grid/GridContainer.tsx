@@ -20,8 +20,10 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
       ? data.filter((item) => item.isSubscribed)
       : data;
 
+    const sliced = filteredData.slice(0, 96);
+
     const startIdx = pageIndex * ITEMS_PER_PAGE;
-    return filteredData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+    return sliced.slice(startIdx, startIdx + ITEMS_PER_PAGE);
   }, [data, pageIndex, isFiltered]);
 
   const totalPages = useMemo(() => {
@@ -32,7 +34,9 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
       ? data.filter((item) => item.isSubscribed)
       : data;
 
-    return Math.ceil((filteredData?.length || 0) / ITEMS_PER_PAGE);
+    const sliced = filteredData.slice(0, 96);
+
+    return Math.ceil((sliced?.length || 0) / ITEMS_PER_PAGE);
   }, [data, isFiltered]);
 
   if (isLoading) {
