@@ -1,11 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  getNewsstandPress,
-  getSubscriptions,
-  addSubscription,
-  removeSubscription,
-  getRolling,
-} from "@/api/newsClient";
+import { useQuery } from "@tanstack/react-query";
+import { getNewsstandPress, getRolling } from "@/api/newsClient";
 
 export const newsQueryKeys = {
   all: ["news"] as const,
@@ -28,42 +22,6 @@ export const useNewsstandPress = (pid: string) => {
     queryKey: newsQueryKeys.newsstandDetail(pid),
     queryFn: () => getNewsstandPress(pid),
     enabled: !!pid,
-  });
-};
-
-// 구독 목록 조회
-export const useSubscriptions = () => {
-  return useQuery({
-    queryKey: newsQueryKeys.subscriptions(),
-    queryFn: getSubscriptions,
-  });
-};
-
-// 구독 추가
-export const useAddSubscription = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: addSubscription,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: newsQueryKeys.subscriptions(),
-      });
-    },
-  });
-};
-
-// 구독 해제
-export const useRemoveSubscription = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: removeSubscription,
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: newsQueryKeys.subscriptions(),
-      });
-    },
   });
 };
 
