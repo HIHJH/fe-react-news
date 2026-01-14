@@ -20,6 +20,7 @@ export const useCompositeNewsstand = () => {
   };
 };
 
+// 리스트인 경우는 96개만 뽑을 필요 없으니 리스트용 함수 만들거나 분리 필요
 const transformNewsstand = (data: NewsstandData, subIdList?: string[]) => {
   // 구독 ID Set 생성
   const subIdSet = subIdList ? new Set(subIdList) : new Set<string>();
@@ -38,3 +39,4 @@ const transformNewsstand = (data: NewsstandData, subIdList?: string[]) => {
     })) || []
   );
 };
+export type NewsstandMapData = ReturnType<typeof transformNewsstand>;
