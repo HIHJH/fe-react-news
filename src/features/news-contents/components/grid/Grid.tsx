@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNewsstandGrid } from "@/features/news-contents/hooks/useNewsstand";
+import { useCompositeNewsstand } from "@/features/news-contents/hooks/useCompositeNewsstand";
 
 interface GridProps {
   isFiltered: boolean;
@@ -8,7 +8,7 @@ interface GridProps {
 const ITEMS_PER_PAGE = 24;
 
 const Grid = ({ isFiltered }: GridProps) => {
-  const { data, isLoading, isError } = useNewsstandGrid();
+  const { data, isLoading } = useCompositeNewsstand();
   const [pageIndex, setPageIndex] = useState(0);
 
   const paginatedData = useMemo(() => {
@@ -39,7 +39,7 @@ const Grid = ({ isFiltered }: GridProps) => {
     );
   }
 
-  if (isError || !data) {
+  if (!data) {
     return (
       <section className="w-full">
         <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
