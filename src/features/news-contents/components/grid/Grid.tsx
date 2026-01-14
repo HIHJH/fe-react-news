@@ -1,68 +1,54 @@
-import { useState, useMemo } from "react";
-import { useCompositeNewsstand } from "@/features/news-contents/hooks/useCompositeNewsstand";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addSubscription, removeSubscription } from "@/api/newsClient";
+import { newsQueryKeys } from "@/api/newsQueryKeys";
+import type { NewsstandMapData } from "@/features/news-contents/hooks/useCompositeNewsstand";
 
-interface GridProps {
-  isFiltered: boolean;
-}
+type GridProps = {
+  data: NewsstandMapData;
+};
 
-const ITEMS_PER_PAGE = 24;
+const Grid = ({ data }: GridProps) => {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-const Grid = ({ isFiltered }: GridProps) => {
-  const { data, isLoading } = useCompositeNewsstand();
-  const [pageIndex, setPageIndex] = useState(0);
+  // 구독 추가 mutation
+  const addSubMutation = useMutation({
+    mutationFn: addSubscription,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: newsQueryKeys.subscriptions(),
+      });
+    },
+  });
 
-  const paginatedData = useMemo(() => {
-    if (!data) return [];
-    const startIdx = pageIndex * ITEMS_PER_PAGE;
-    return data.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-  }, [data, pageIndex]);
+  // 구독 취소 mutation
+  const removeSubMutation = useMutation({
+    mutationFn: removeSubscription,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: newsQueryKeys.subscriptions(),
+      });
+    },
+  });
 
-  const totalPages = useMemo(() => {
-    return Math.ceil((data?.length || 0) / ITEMS_PER_PAGE);
-  }, [data]);
-
-  if (isLoading) {
-    return (
-      <section className="w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-          {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-        </h2>
-        <div className="grid grid-cols-6 gap-4">
-          {[...Array(24)].map((_, i) => (
-            <div
-              key={i}
-              className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-            />
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  if (!data) {
-    return (
-      <section className="w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-          {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-        </h2>
-        <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-          데이터를 불러올 수 없습니다.
-        </div>
-      </section>
-    );
-  }
+  const handleSubscriptionToggle = (pid: string, isSubscribed: boolean) => {
+    if (isSubscribed) {
+      removeSubMutation.mutate(pid);
+    } else {
+      addSubMutation.mutate(pid);
+    }
+  };
 
   return (
     <section className="w-full">
-      <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
-        {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-      </h2>
-
       <div className="grid grid-cols-6 gap-4">
-        {paginatedData.map((news) => (
+        {data.map((news) => (
           <div
             key={news.pid}
             className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 hover:shadow-lg dark:hover:shadow-lg dark:hover:shadow-gray-900/50 cursor-pointer"
+            onMouseEnter={() => setHoveredId(news?.pid ?? "")}
+            onMouseLeave={() => setHoveredId(null)}
           >
             {/* Logo Image */}
             <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-3">
@@ -82,63 +68,38 @@ const Grid = ({ isFiltered }: GridProps) => {
                 {news.name}
               </p>
             </div>
+
+            {/* Subscribe Button */}
+            {hoveredId === news.pid && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40 animate-in fade-in duration-200">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSubscriptionToggle(
+                      news?.pid ?? "",
+                      news.isSubscribed
+                    );
+                  }}
+                  disabled={
+                    addSubMutation.isPending || removeSubMutation.isPending
+                  }
+                  className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
+                    news.isSubscribed
+                      ? "bg-gray-400 text-white hover:bg-gray-500 disabled:bg-gray-400"
+                      : "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-600"
+                  } disabled:opacity-70 disabled:cursor-not-allowed`}
+                >
+                  {addSubMutation.isPending || removeSubMutation.isPending
+                    ? "처리 중..."
+                    : news.isSubscribed
+                    ? "구독 해제"
+                    : "구독하기"}
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
-
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-8">
-          <button
-            onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
-            disabled={pageIndex === 0}
-            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="이전 페이지"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {pageIndex + 1} / {totalPages}
-          </span>
-
-          <button
-            onClick={() =>
-              setPageIndex(Math.min(totalPages - 1, pageIndex + 1))
-            }
-            disabled={pageIndex === totalPages - 1}
-            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="다음 페이지"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-        </div>
-      )}
-
       {data.length === 0 && (
         <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
           언론사가 없습니다.

@@ -1,5 +1,5 @@
 import NewsTab from "@/features/news-contents/components/NewsTab";
-import Grid from "@/features/news-contents/components/grid/Grid";
+import GridContainer from "@/features/news-contents/components/grid/GridContainer";
 import List from "@/features/news-contents/components/list/List";
 import { useReducer } from "react";
 import {
@@ -14,7 +14,7 @@ const NewsContents = () => {
 
   const isGrid = newsState.viewMode === "grid";
   const isFiltered = newsState.filter === "subscribed";
-  const ContentsComponent = isGrid ? Grid : List;
+  const ContentsComponent = isGrid ? GridContainer : List;
 
   return (
     <section>
