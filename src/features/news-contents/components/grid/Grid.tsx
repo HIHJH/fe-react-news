@@ -51,9 +51,7 @@ const Grid = ({ data }: GridProps) => {
               aria-label={news.isSubscribed ? "해지하기" : "구독하기"}
               disabled={isPending}
             >
-              {isPending ? (
-                <>Loading...</>
-              ) : news.isSubscribed ? (
+              {news.isSubscribed ? (
                 <>
                   <CrossIcon className="w-3 text-weak" />
                   해지하기
