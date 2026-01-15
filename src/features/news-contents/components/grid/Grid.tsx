@@ -11,8 +11,9 @@ type GridProps = {
 };
 
 const Grid = ({ data }: GridProps) => {
-  const { mutate: subscribe } = useSubscribe();
-  const { mutate: unSubscribe } = useUnsubscribe();
+  const { mutate: subscribe, isPending: isSubscribePending } = useSubscribe();
+  const { mutate: unSubscribe, isPending: isUnsubscribePending } =
+    useUnsubscribe();
 
   const handleSubscriptionToggle = (pid: string, isSubscribed: boolean) => {
     if (isSubscribed) {
@@ -21,6 +22,8 @@ const Grid = ({ data }: GridProps) => {
       subscribe(pid);
     }
   };
+
+  const isPending = isSubscribePending || isUnsubscribePending;
 
   return (
     <div className="w-full h-full grid grid-cols-6 grid-rows-4 gap-px bg-gray-200 border border-gray-200">
@@ -46,6 +49,7 @@ const Grid = ({ data }: GridProps) => {
               }}
               className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-6 flex items-center justify-center gap-0.5 bg-white border border-gray-200 rounded-full text-gray-500 text-xs font-medium opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 hover:bg-gray-50 whitespace-nowrap z-10"
               aria-label={news.isSubscribed ? "해지하기" : "구독하기"}
+              disabled={isPending}
             >
               {news.isSubscribed ? (
                 <>
