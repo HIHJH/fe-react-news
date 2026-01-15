@@ -5,12 +5,12 @@ import RightArrowIcon from "@/assets/icons/right_arrow.svg?react";
 import { useGridNavigation } from "../../hooks/useGridNavigation";
 
 type GridContainerProps = {
-  isFiltered: boolean;
+  isSubscribed: boolean;
 };
 
-const GridContainer = ({ isFiltered }: GridContainerProps) => {
+const GridContainer = ({ isSubscribed }: GridContainerProps) => {
   const { allGridData, subscribedGridData } = useCompositeNewsstand();
-  const data = isFiltered ? subscribedGridData : allGridData;
+  const data = isSubscribed ? subscribedGridData : allGridData;
 
   const {
     pageIndex,
@@ -18,7 +18,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
     paginatedData,
     handlePrev,
     handleNext,
-  } = useGridNavigation(data, isFiltered);
+  } = useGridNavigation(data, isSubscribed);
 
   return (
     <section className="w-full flex flex-col items-center">

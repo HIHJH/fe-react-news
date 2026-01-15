@@ -10,7 +10,7 @@ interface NewsTabProps {
 
 const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
   const isGrid = viewMode === "GRID_ALL" || viewMode === "GRID_SUBSCRIBED";
-  const isFiltered =
+  const isSubscribed =
     viewMode === "GRID_SUBSCRIBED" || viewMode === "LIST_SUBSCRIBED";
 
   const handleFilterChange = (filter: "all" | "subscribed") => {
@@ -28,10 +28,10 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
   const handleViewChange = (view: "grid" | "list") => {
     const newViewMode =
       view === "grid"
-        ? isFiltered
+        ? isSubscribed
           ? "GRID_SUBSCRIBED"
           : "GRID_ALL"
-        : isFiltered
+        : isSubscribed
           ? "LIST_SUBSCRIBED"
           : "LIST_ALL";
     onViewModeChange(newViewMode);
@@ -42,18 +42,18 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
       <div className="relative flex gap-6 items-center">
         <button
           onClick={() => handleFilterChange("all")}
-          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${!isFiltered
-              ? "typo-selected-bold-16 text-strong"
-              : "typo-available-medium-16 text-weak hover:text-strong"
+          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${!isSubscribed
+            ? "typo-selected-bold-16 text-strong"
+            : "typo-available-medium-16 text-weak hover:text-strong"
             }`}
         >
           전체 언론사
         </button>
         <button
           onClick={() => handleFilterChange("subscribed")}
-          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${isFiltered
-              ? "typo-selected-bold-16 text-strong"
-              : "typo-available-medium-16 text-weak hover:text-strong"
+          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${isSubscribed
+            ? "typo-selected-bold-16 text-strong"
+            : "typo-available-medium-16 text-weak hover:text-strong"
             }`}
         >
           내가 구독한 언론사

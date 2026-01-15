@@ -5,13 +5,13 @@ const ITEMS_PER_PAGE = 24;
 
 export const useGridNavigation = (
   data: GridItem[] | null,
-  isFiltered: boolean
+  isSubscribed: boolean
 ) => {
   const [pageIndex, setPageIndex] = useState(0);
 
   useEffect(() => {
     setPageIndex(0);
-  }, [isFiltered]);
+  }, [isSubscribed]);
 
   useEffect(() => {
     if (data && pageIndex * ITEMS_PER_PAGE >= data.length && pageIndex > 0) {

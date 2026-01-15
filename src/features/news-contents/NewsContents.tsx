@@ -17,7 +17,7 @@ const NewsContents = () => {
   const [viewMode, setViewMode] = useState<NewsViewMode>("GRID_ALL");
 
   const isGrid = viewMode === "GRID_ALL" || viewMode === "GRID_SUBSCRIBED";
-  const isFiltered =
+  const isSubscribed =
     viewMode === "GRID_SUBSCRIBED" || viewMode === "LIST_SUBSCRIBED";
 
   const ContentsComponent = isGrid ? GridContainer : ListContainer;
@@ -29,7 +29,7 @@ const NewsContents = () => {
   return (
     <section>
       <NewsTab viewMode={viewMode} onViewModeChange={handleViewModeChange} />
-      <ContentsComponent isFiltered={isFiltered} />
+      <ContentsComponent isSubscribed={isSubscribed} />
     </section>
   );
 };

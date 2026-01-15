@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect, } from "react";
 import type { CategoryInfo } from "@/api/api";
 
 export const useListNavigation = (categories: CategoryInfo[]) => {
@@ -69,6 +69,11 @@ export const useListNavigation = (categories: CategoryInfo[]) => {
 
     return categories[nextCatIdx]?.pids[nextPressIdx] ?? "";
   }, [categories, currentCategoryIndex, currentPressIndex]);
+
+  useEffect(() => {
+    setCurrentCategoryIndex(0);
+    setCurrentPressIndex(0);
+  }, [categories]);
 
   return {
     currentCategoryIndex,
