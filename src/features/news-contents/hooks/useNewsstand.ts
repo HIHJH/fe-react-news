@@ -7,5 +7,6 @@ export const useNewsstand = () => {
   return useQuery({
     queryKey: newsQueryKeys.newsstand(),
     queryFn: getNewsstand,
+    staleTime: 5 * 60 * 1000,
   });
 };

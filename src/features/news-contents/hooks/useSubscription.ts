@@ -7,5 +7,6 @@ export const useSubscription = () => {
   return useQuery({
     queryKey: newsQueryKeys.subscriptions(),
     queryFn: getSubscriptions,
+    staleTime: 5 * 60 * 1000,
   });
 };
