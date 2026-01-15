@@ -36,7 +36,7 @@ export const useSubscribe = () => {
       return { previousData };
     },
 
-    onError: (err, pid, context) => {
+    onError: (_err, _pid, context) => {
       // 실패 시 이전 데이터로 롤백
       if (context?.previousData) {
         queryClient.setQueryData(
