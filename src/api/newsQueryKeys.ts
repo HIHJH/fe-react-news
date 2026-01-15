@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getNewsstandPress, getRolling } from "@/api/newsClient";
+import { requestApi } from "./client";
 
 export const newsQueryKeys = {
   all: ["news"] as const,
@@ -20,7 +20,7 @@ export const newsQueryKeys = {
 export const useNewsstandPress = (pid: string) => {
   return useQuery({
     queryKey: newsQueryKeys.newsstandDetail(pid),
-    queryFn: () => getNewsstandPress(pid),
+    queryFn: () => requestApi("GET", "/api/newsstand/{pid}", { pid }),
     enabled: !!pid,
   });
 };
@@ -29,6 +29,6 @@ export const useNewsstandPress = (pid: string) => {
 export const useRolling = () => {
   return useQuery({
     queryKey: newsQueryKeys.rolling(),
-    queryFn: getRolling,
+    queryFn: () => requestApi("GET", "/api/rolling"),
   });
 };

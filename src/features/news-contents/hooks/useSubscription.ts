@@ -1,4 +1,4 @@
-import { getSubscriptions } from "@/api/newsClient";
+import { requestApi } from "@/api/client";
 import { newsQueryKeys } from "@/api/newsQueryKeys";
 import { useQuery } from "@tanstack/react-query";
 
@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 export const useSubscription = () => {
   return useQuery({
     queryKey: newsQueryKeys.subscriptions(),
-    queryFn: getSubscriptions,
+    queryFn: () => requestApi("GET", "/api/subscribe"),
     staleTime: 5 * 60 * 1000,
   });
 };

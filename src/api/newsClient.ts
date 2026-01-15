@@ -1,112 +1,58 @@
-import axios from "axios";
-import type { AxiosInstance, AxiosResponse } from "axios";
-import type { paths } from "./api";
+const BASE_URL = "https://news-worker.forhyundaisofteer.workers.dev";
 
-// axios 인스턴스 생성
-const API_BASE_URL = "https://news-worker.forhyundaisofteer.workers.dev";
-const newsClient: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-  withCredentials: true, // 쿠키 전송을 위해 필요
-});
+type RequestOptions = RequestInit;
 
-// GET 응답 타입 추출 헬퍼
-type GetResponse<T extends keyof paths> = paths[T]["get"] extends {
-  responses: { 200: { content: { "application/json": infer R } } };
-}
-  ? R
-  : paths[T]["get"] extends {
-      responses: { 201: { content: { "application/json": infer R } } };
+async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+  const fullUrl = url.startsWith("http") ? url : `${BASE_URL}${url}`;
+
+  const response = await fetch(fullUrl, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    // Attempt to parse error message from body if available
+    try {
+      const errorData = await response.json();
+      throw new Error(errorData.message || errorData.error || `HTTP Error: ${response.status}`);
+    } catch (e) {
+      if (e instanceof Error && e.message.startsWith("HTTP Error")) throw e;
+      throw new Error(`HTTP Error: ${response.status}`);
     }
-  ? R
-  : never;
+  }
 
-// POST 응답 타입 추출 헬퍼
-type PostResponse<T extends keyof paths> = paths[T]["post"] extends {
-  responses: { 201: { content: { "application/json": infer R } } };
-}
-  ? R
-  : paths[T]["post"] extends {
-      responses: { 200: { content: { "application/json": infer R } } };
-    }
-  ? R
-  : never;
+  // Handle 204 No Content or empty responses
+  if (response.status === 204) {
+    return {} as unknown as T;
+  }
 
-// DELETE 응답 타입 추출 헬퍼
-type DeleteResponse<T extends keyof paths> = paths[T]["delete"] extends {
-  responses: { 200: { content: { "application/json": infer R } } };
-}
-  ? R
-  : never;
-
-/**
- * /api/newsstand - 모든 언론사 정보 조회
- */
-export async function getNewsstand(): Promise<GetResponse<"/api/newsstand">> {
-  const response: AxiosResponse<GetResponse<"/api/newsstand">> =
-    await newsClient.get<GetResponse<"/api/newsstand">>("/api/newsstand");
-
-  return response.data;
+  const text = await response.text();
+  try {
+    return text ? JSON.parse(text) : ({} as unknown as T);
+  } catch {
+    throw new Error("Failed to parse JSON response");
+  }
 }
 
-/**
- * /api/newsstand/{pid} - 특정 언론사 정보 조회
- */
-export async function getNewsstandPress(
-  pid: string
-): Promise<GetResponse<"/api/newsstand/{pid}">> {
-  const response: AxiosResponse<GetResponse<"/api/newsstand/{pid}">> =
-    await newsClient.get<GetResponse<"/api/newsstand/{pid}">>(
-      `/api/newsstand/${pid}`
-    );
-  return response.data;
-}
-
-/**
- * /api/subscribe - 현재 사용자의 구독 목록 조회
- */
-export async function getSubscriptions(): Promise<
-  GetResponse<"/api/subscribe">
-> {
-  const response: AxiosResponse<GetResponse<"/api/subscribe">> =
-    await newsClient.get<GetResponse<"/api/subscribe">>("/api/subscribe");
-
-  return response.data;
-}
-
-/**
- * /api/subscribe/{pid} POST - 구독 추가
- */
-export async function addSubscription(
-  pid: string
-): Promise<PostResponse<"/api/subscribe/{pid}">> {
-  const response: AxiosResponse<PostResponse<"/api/subscribe/{pid}">> =
-    await newsClient.post<PostResponse<"/api/subscribe/{pid}">>(
-      `/api/subscribe/${pid}`
-    );
-  return response.data;
-}
-
-/**
- * /api/subscribe/{pid} DELETE - 구독 해제
- */
-export async function removeSubscription(
-  pid: string
-): Promise<DeleteResponse<"/api/subscribe/{pid}">> {
-  const response: AxiosResponse<DeleteResponse<"/api/subscribe/{pid}">> =
-    await newsClient.delete<DeleteResponse<"/api/subscribe/{pid}">>(
-      `/api/subscribe/${pid}`
-    );
-  return response.data;
-}
-
-/**
- * /api/rolling - 롤링 뉴스 데이터 조회
- */
-export async function getRolling(): Promise<GetResponse<"/api/rolling">> {
-  const response: AxiosResponse<GetResponse<"/api/rolling">> =
-    await newsClient.get<GetResponse<"/api/rolling">>("/api/rolling");
-  return response.data;
-}
+export const httpClient = {
+  get: <T>(url: string, options?: RequestOptions) =>
+    request<T>(url, { ...options, method: "GET" }),
+  post: <T>(url: string, body?: unknown, options?: RequestOptions) =>
+    request<T>(url, {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+  delete: <T>(url: string, options?: RequestOptions) =>
+    request<T>(url, { ...options, method: "DELETE" }),
+  put: <T>(url: string, body?: unknown, options?: RequestOptions) =>
+    request<T>(url, {
+      ...options,
+      method: "PUT",
+      body: JSON.stringify(body),
+    }),
+};
