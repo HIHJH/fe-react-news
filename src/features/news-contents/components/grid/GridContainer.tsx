@@ -11,7 +11,8 @@ type GridContainerProps = {
 const ITEMS_PER_PAGE = 24;
 
 const GridContainer = ({ isFiltered }: GridContainerProps) => {
-  const { allGridData, subscribedGridData } = useCompositeNewsstand();
+  const { allGridData, subscribedGridData, isLoading } =
+    useCompositeNewsstand();
   const [pageIndex, setPageIndex] = useState(0);
 
   const data = isFiltered ? subscribedGridData : allGridData;
@@ -43,6 +44,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
     return Math.ceil(data.length / ITEMS_PER_PAGE);
   }, [data]);
 
+  if (isLoading) return <>Loading...</>;
   return (
     <section className="w-full flex flex-col items-center">
       <div className="w-[930px]">
