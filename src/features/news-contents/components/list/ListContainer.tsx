@@ -5,7 +5,9 @@ import { useSubscription } from "../../hooks/useSubscription";
 import { newsQueryKeys } from "@/api/newsQueryKeys";
 import { httpClient } from "@/api/newsClient";
 import { useListNavigation } from "../../hooks/useListNavigation";
-import List from "./List";
+import ListCategoryTab from "@/features/news-contents/components/list/ListCategoryTab";
+import List from "@/features/news-contents/components/list/List";
+import PaginationButtons from "@/features/news-contents/components/pagination/PaginationButtons";
 
 export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
   const queryClient = useQueryClient();
@@ -53,7 +55,11 @@ export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
   }, [nextPid, queryClient]);
 
   if (isNewsstandLoading || !newsstandData) {
-    return <div className="flex items-center justify-center p-10 text-default">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center p-10 text-default">
+        Loading...
+      </div>
+    );
   }
 
   if (isSubscribed && displayCategories.length === 0) {
@@ -65,14 +71,23 @@ export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
   }
 
   return (
-    <List
-      categories={displayCategories}
-      currentCategoryIndex={currentCategoryIndex}
-      currentPressIndex={currentPressIndex}
-      onCategoryChange={handleCategoryChange}
-      onNext={handleNext}
-      onPrev={handlePrev}
-      pressData={pressData}
-    />
+    <div className="w-full border border-default bg-surface-default relative">
+      <ListCategoryTab
+        categories={displayCategories}
+        currentCategoryIndex={currentCategoryIndex}
+        currentPressIndex={currentPressIndex}
+        onCategoryChange={handleCategoryChange}
+        onNext={handleNext}
+      />
+      <List pressData={pressData} />
+      <PaginationButtons
+        onNext={handleNext}
+        onPrev={handlePrev}
+        ariaLabels={{
+          prev: "이전 언론사",
+          next: "다음 언론사",
+        }}
+      />
+    </div>
   );
 };
