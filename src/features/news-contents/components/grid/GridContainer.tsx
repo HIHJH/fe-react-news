@@ -75,7 +75,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
               <button
                 onClick={() => setPageIndex((prev) => Math.max(0, prev - 1))}
                 disabled={pageIndex === 0}
-                className="absolute top-1/2 -left-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity"
+                className="absolute top-1/2 -left-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="이전 페이지"
               >
                 <LeftArrowIcon />
@@ -84,7 +84,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
               <button
                 onClick={() => setPageIndex((prev) => Math.min(totalPages - 1, prev + 1))}
                 disabled={pageIndex === totalPages - 1}
-                className="absolute top-1/2 -right-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity"
+                className="absolute top-1/2 -right-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="다음 페이지"
               >
                 <RightArrowIcon />
