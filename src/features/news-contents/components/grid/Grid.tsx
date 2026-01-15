@@ -2,13 +2,47 @@ import type { NewsstandMapData } from "@/features/news-contents/hooks/useComposi
 import { useSubscribe } from "@/features/news-contents/hooks/useSubscribe";
 import { useUnsubscribe } from "@/features/news-contents/hooks/useUnsubscribe";
 
+type GridItem = NewsstandMapData[number];
+
 type GridProps = {
-  data: NewsstandMapData;
+  data: (GridItem | null)[];
 };
 
+const PlusIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="flex-shrink-0"
+  >
+    <path
+      d="M9.5 6.49902H6.5V9.49902H5.5V6.49902H2.5V5.49902H5.5V2.49902H6.5V5.49902H9.5V6.49902Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
+const CrossIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 12 12"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className="flex-shrink-0"
+  >
+    <path
+      d="M3.6 9L3 8.4L5.4 6L3 3.6L3.6 3L6 5.4L8.4 3L9 3.6L6.6 6L9 8.4L8.4 9L6 6.6L3.6 9Z"
+      fill="currentColor"
+    />
+  </svg>
+);
+
 const Grid = ({ data }: GridProps) => {
-  const { mutate: subscribe, isPending: isSubscribing } = useSubscribe();
-  const { mutate: unSubscribe, isPending: isUnsubscribing } = useUnsubscribe();
+  const { mutate: subscribe } = useSubscribe();
+  const { mutate: unSubscribe } = useUnsubscribe();
 
   const handleSubscriptionToggle = (pid: string, isSubscribed: boolean) => {
     if (isSubscribed) {
@@ -19,62 +53,54 @@ const Grid = ({ data }: GridProps) => {
   };
 
   return (
-    <section className="w-full">
-      <div className="grid grid-cols-6 gap-4">
-        {data.map((news) => (
+    <div className="w-full h-full grid grid-cols-6 grid-rows-4 gap-px bg-gray-200 border border-gray-200">
+      {data.map((news, index) => {
+        if (!news) {
+          return (
+            <div
+              key={`empty-${index}`}
+              className="bg-white"
+            />
+          );
+        }
+
+        return (
           <div
             key={news.pid}
-            className="group relative aspect-square rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 hover:shadow-lg dark:hover:shadow-lg dark:hover:shadow-gray-900/50 cursor-pointer"
+            className="group relative flex items-center justify-center bg-white hover:bg-gray-100 cursor-pointer overflow-hidden"
           >
             {/* Logo Image */}
-            <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-3">
-              <img
-                src={news.logoLight}
-                alt={news.name}
-                className="max-w-full max-h-full object-contain"
-              />
-            </div>
+            <img
+              src={news.logoLight}
+              alt={news.name}
+              className="h-5 max-w-full object-contain group-hover:opacity-0 transition-opacity duration-200"
+            />
 
-            {/* Hover Overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300" />
-
-            {/* News Name Tooltip */}
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-              <p className="text-white text-xs font-medium truncate">
-                {news.name}
-              </p>
-            </div>
-
-            {/* Subscribe Button */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleSubscriptionToggle(news?.pid ?? "", news.isSubscribed);
-                }}
-                disabled={isSubscribing || isUnsubscribing}
-                className={`px-4 py-2 rounded-md font-medium text-sm transition-colors ${
-                  news.isSubscribed
-                    ? "bg-gray-400 text-white hover:bg-gray-500 disabled:bg-gray-400"
-                    : "bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-600"
-                } disabled:opacity-70 disabled:cursor-not-allowed`}
-              >
-                {isSubscribing || isUnsubscribing
-                  ? "처리 중..."
-                  : news.isSubscribed
-                  ? "구독 해제"
-                  : "구독하기"}
-              </button>
-            </div>
+            {/* Subscribe/Unsubscribe Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSubscriptionToggle(news.pid, news.isSubscribed);
+              }}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-6 flex items-center justify-center gap-0.5 bg-white border border-gray-200 rounded-full text-gray-500 text-xs font-medium opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 hover:bg-gray-50 whitespace-nowrap z-10"
+              aria-label={news.isSubscribed ? "해지하기" : "구독하기"}
+            >
+              {news.isSubscribed ? (
+                <>
+                  <CrossIcon />
+                  해지하기
+                </>
+              ) : (
+                <>
+                  <PlusIcon />
+                  구독하기
+                </>
+              )}
+            </button>
           </div>
-        ))}
-      </div>
-      {data.length === 0 && (
-        <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-          언론사가 없습니다.
-        </div>
-      )}
-    </section>
+        );
+      })}
+    </div>
   );
 };
 

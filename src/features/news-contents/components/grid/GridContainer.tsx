@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useCompositeNewsstand } from "@/features/news-contents/hooks/useCompositeNewsstand";
 import Grid from "@/features/news-contents/components/grid/Grid";
 
@@ -8,97 +8,93 @@ type GridContainerProps = {
 
 const ITEMS_PER_PAGE = 24;
 
+const LeftArrowIcon = () => (
+  <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 10L6 20L16 30" stroke="#879296" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const RightArrowIcon = () => (
+  <svg width="24" height="40" viewBox="0 0 24 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 10L18 20L8 30" stroke="#879296" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const GridContainer = ({ isFiltered }: GridContainerProps) => {
-  const { allGridData, subscribedGridData, isLoading } =
-    useCompositeNewsstand();
+  const { allGridData, subscribedGridData } = useCompositeNewsstand();
   const [pageIndex, setPageIndex] = useState(0);
 
   const data = isFiltered ? subscribedGridData : allGridData;
 
-  const paginatedData = useMemo(() => {
-    if (!data) return [];
+  // Reset page index if type changes or data length shrinks
+  useEffect(() => {
+    setPageIndex(0);
+  }, [isFiltered]);
 
+  useEffect(() => {
+    if (data && pageIndex * ITEMS_PER_PAGE >= data.length && pageIndex > 0) {
+      setPageIndex(Math.max(0, Math.ceil(data.length / ITEMS_PER_PAGE) - 1));
+    }
+  }, [data?.length, pageIndex]);
+
+  const paginatedData = useMemo(() => {
+    const sourceData = data || [];
     const startIdx = pageIndex * ITEMS_PER_PAGE;
-    return data.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+    const sliced = sourceData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+    // Pad array to ensure exactly 24 items
+    const padded: (typeof sliced[number] | null)[] = [...sliced];
+    while (padded.length < ITEMS_PER_PAGE) {
+      padded.push(null);
+    }
+    return padded;
   }, [data, pageIndex]);
 
   const totalPages = useMemo(() => {
-    if (!data) return 0;
+    if (!data || data.length === 0) return 0;
     return Math.ceil(data.length / ITEMS_PER_PAGE);
   }, [data]);
 
-  if (isLoading) {
-    return (
-      <section className="w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-          {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-        </h2>
-        <div className="grid grid-cols-6 gap-4">
-          {[...Array(24)].map((_, i) => (
-            <div
-              key={i}
-              className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"
-            />
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  if (!data) {
-    return (
-      <section className="w-full">
-        <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-          {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-        </h2>
-        <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-          데이터를 불러올 수 없습니다.
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="w-full">
-      <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">
-        {isFiltered ? "구독한 언론사 그리드" : "전체 언론사 그리드"}
-      </h2>
+    <section className="w-full flex flex-col items-center">
+      <div className="w-[930px]">
+        <div className="relative">
+          {/* Grid Container Fixed Size */}
+          <div className="w-[930px] h-[388px]">
+            {/* 
+              Render Grid with data. 
+              If loading and no data, we still render the structure (padded with nulls from memo default)
+              Grid handles null items as empty cells.
+            */}
+            <Grid data={paginatedData} />
+          </div>
 
-      <Grid data={paginatedData} />
+          {/* Navigation Controls */}
+          {totalPages > 1 && (
+            <>
+              <button
+                onClick={() => setPageIndex((prev) => Math.max(0, prev - 1))}
+                disabled={pageIndex === 0}
+                className="absolute top-1/2 -left-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity"
+                aria-label="이전 페이지"
+              >
+                <LeftArrowIcon />
+              </button>
 
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-3 mt-8">
-          <button
-            onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
-            disabled={pageIndex === 0}
-            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="이전 페이지"
-          >
-            {`<`}
-          </button>
+              <button
+                onClick={() => setPageIndex((prev) => Math.min(totalPages - 1, prev + 1))}
+                disabled={pageIndex === totalPages - 1}
+                className="absolute top-1/2 -right-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity"
+                aria-label="다음 페이지"
+              >
+                <RightArrowIcon />
+              </button>
 
-          <span className="text-sm text-gray-600 dark:text-gray-400">
-            {pageIndex + 1} / {totalPages}
-          </span>
-
-          <button
-            onClick={() =>
-              setPageIndex(Math.min(totalPages - 1, pageIndex + 1))
-            }
-            disabled={pageIndex === totalPages - 1}
-            className="p-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            aria-label="다음 페이지"
-          >
-            {`>`}
-          </button>
+              {/* Note: The reference implementation has prev/next buttons outside. */}
+            </>
+          )}
         </div>
-      )}
-
-      {data.length === 0 && (
-        <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-          언론사가 없습니다.
-        </div>
-      )}
+      </div>
     </section>
   );
 };
