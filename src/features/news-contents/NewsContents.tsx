@@ -1,4 +1,4 @@
-import NewsTab from "@/features/news-contents/components/NewsTab";
+import NewsTab from "@/features/news-contents/components/tab/NewsTab";
 import GridContainer from "@/features/news-contents/components/grid/GridContainer";
 import List from "@/features/news-contents/components/list/List";
 import { useState } from "react";

@@ -1,5 +1,6 @@
 import GridIcon from "@/assets/icons/grid_icon.svg?react";
 import ListIcon from "@/assets/icons/list_icon.svg?react";
+import Badge from "@/features/news-contents/components/tab/Badge";
 import type { NewsViewMode } from "@/features/news-contents/NewsContents";
 
 interface NewsTabProps {
@@ -38,7 +39,7 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
 
   return (
     <div className="flex justify-between">
-      <div className="flex gap-6">
+      <div className="relative flex gap-6">
         <TabButton
           isActive={!isFiltered}
           buttonText="전체 언론사"
@@ -49,6 +50,7 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
           buttonText="내가 구독한 언론사"
           onClick={() => handleFilterChange("subscribed")}
         />
+        <Badge />
       </div>
       <div className="flex gap-2">
         <ListIcon
