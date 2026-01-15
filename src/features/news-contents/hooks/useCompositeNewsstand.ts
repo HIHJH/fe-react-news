@@ -2,7 +2,7 @@ import { useNewsstand } from "@/features/news-contents/hooks/useNewsstand";
 import { useSubscription } from "@/features/news-contents/hooks/useSubscription";
 import { useEffect, useMemo, useState } from "react";
 
-type GridItem = {
+export type GridItem = {
   pid: string;
   name: string;
   logoLight: string;

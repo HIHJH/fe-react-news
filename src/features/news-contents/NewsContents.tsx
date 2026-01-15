@@ -1,6 +1,6 @@
 import NewsTab from "@/features/news-contents/components/tab/NewsTab";
 import GridContainer from "@/features/news-contents/components/grid/GridContainer";
-import List from "@/features/news-contents/components/list/List";
+import { ListContainer } from "@/features/news-contents/components/list/ListContainer";
 import { useState } from "react";
 
 export type NewsViewMode =
@@ -20,7 +20,7 @@ const NewsContents = () => {
   const isFiltered =
     viewMode === "GRID_SUBSCRIBED" || viewMode === "LIST_SUBSCRIBED";
 
-  const ContentsComponent = isGrid ? GridContainer : List;
+  const ContentsComponent = isGrid ? GridContainer : ListContainer;
 
   const handleViewModeChange = (newMode: NewsViewMode) => {
     setViewMode(newMode);

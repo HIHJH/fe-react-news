@@ -20,8 +20,8 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
           ? "GRID_ALL"
           : "LIST_ALL"
         : isGrid
-        ? "GRID_SUBSCRIBED"
-        : "LIST_SUBSCRIBED";
+          ? "GRID_SUBSCRIBED"
+          : "LIST_SUBSCRIBED";
     onViewModeChange(newViewMode);
   };
 
@@ -32,8 +32,8 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
           ? "GRID_SUBSCRIBED"
           : "GRID_ALL"
         : isFiltered
-        ? "LIST_SUBSCRIBED"
-        : "LIST_ALL";
+          ? "LIST_SUBSCRIBED"
+          : "LIST_ALL";
     onViewModeChange(newViewMode);
   };
 
@@ -42,21 +42,19 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
       <div className="relative flex gap-6 items-center">
         <button
           onClick={() => handleFilterChange("all")}
-          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${
-            !isFiltered
-              ? "typo-selected-bold-16 text-grayscale-black"
-              : "typo-available-medium-16 text-grayscale-400 hover:text-grayscale-black"
-          }`}
+          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${!isFiltered
+              ? "typo-selected-bold-16 text-strong"
+              : "typo-available-medium-16 text-weak hover:text-strong"
+            }`}
         >
           전체 언론사
         </button>
         <button
           onClick={() => handleFilterChange("subscribed")}
-          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${
-            isFiltered
-              ? "typo-selected-bold-16 text-grayscale-black"
-              : "typo-available-medium-16 text-grayscale-400 hover:text-grayscale-black"
-          }`}
+          className={`flex items-center gap-1.5 border-none bg-transparent cursor-pointer p-0 transition-colors duration-200 ${isFiltered
+              ? "typo-selected-bold-16 text-strong"
+              : "typo-available-medium-16 text-weak hover:text-strong"
+            }`}
         >
           내가 구독한 언론사
           <Badge />
@@ -66,18 +64,16 @@ const NewsTab = ({ viewMode, onViewModeChange }: NewsTabProps) => {
       <div className="flex gap-2">
         <button
           onClick={() => handleViewChange("list")}
-          className={`w-6 h-6 flex items-center justify-center p-0 bg-transparent border-none cursor-pointer transition-opacity duration-200 hover:opacity-70 ${
-            !isGrid ? "text-point" : "text-grayscale-200"
-          }`}
+          className={`w-6 h-6 flex items-center justify-center p-0 bg-transparent border-none cursor-pointer transition-opacity duration-200 hover:opacity-70 ${!isGrid ? "text-point" : "text-grayscale-200"
+            }`}
           aria-label="리스트 보기"
         >
           <ListIcon className="w-full h-full fill-current" />
         </button>
         <button
           onClick={() => handleViewChange("grid")}
-          className={`w-6 h-6 flex items-center justify-center p-0 bg-transparent border-none cursor-pointer transition-opacity duration-200 hover:opacity-70 ${
-            isGrid ? "text-point" : "text-grayscale-200"
-          }`}
+          className={`w-6 h-6 flex items-center justify-center p-0 bg-transparent border-none cursor-pointer transition-opacity duration-200 hover:opacity-70 ${isGrid ? "text-point" : "text-grayscale-200"
+            }`}
           aria-label="그리드 보기"
         >
           <GridIcon className="w-full h-full fill-current" />

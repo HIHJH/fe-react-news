@@ -16,14 +16,7 @@ export const newsQueryKeys = {
  * ---------
  */
 
-// 특정 언론사 조회
-export const useNewsstandPress = (pid: string) => {
-  return useQuery({
-    queryKey: newsQueryKeys.newsstandDetail(pid),
-    queryFn: () => requestApi("GET", "/api/newsstand/{pid}", { pid }),
-    enabled: !!pid,
-  });
-};
+
 
 // 롤링 뉴스 조회
 export const useRolling = () => {

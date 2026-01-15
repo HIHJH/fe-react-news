@@ -1,47 +1,24 @@
-import { useMemo, useState, useEffect } from "react";
 import { useCompositeNewsstand } from "@/features/news-contents/hooks/useCompositeNewsstand";
 import Grid from "@/features/news-contents/components/grid/Grid";
 import LeftArrowIcon from "@/assets/icons/left_arrow.svg?react";
 import RightArrowIcon from "@/assets/icons/right_arrow.svg?react";
+import { useGridNavigation } from "../../hooks/useGridNavigation";
 
 type GridContainerProps = {
   isFiltered: boolean;
 };
 
-const ITEMS_PER_PAGE = 24;
-
 const GridContainer = ({ isFiltered }: GridContainerProps) => {
   const { allGridData, subscribedGridData } = useCompositeNewsstand();
-  const [pageIndex, setPageIndex] = useState(0);
-
   const data = isFiltered ? subscribedGridData : allGridData;
 
-  useEffect(() => {
-    setPageIndex(0);
-  }, [isFiltered]);
-
-  useEffect(() => {
-    if (data && pageIndex * ITEMS_PER_PAGE >= data.length && pageIndex > 0) {
-      setPageIndex(Math.max(0, Math.ceil(data.length / ITEMS_PER_PAGE) - 1));
-    }
-  }, [data?.length, pageIndex]);
-
-  const paginatedData = useMemo(() => {
-    const sourceData = data || [];
-    const startIdx = pageIndex * ITEMS_PER_PAGE;
-    const sliced = sourceData.slice(startIdx, startIdx + ITEMS_PER_PAGE);
-
-    const padded: ((typeof sliced)[number] | null)[] = [...sliced];
-    while (padded.length < ITEMS_PER_PAGE) {
-      padded.push(null);
-    }
-    return padded;
-  }, [data, pageIndex]);
-
-  const totalPages = useMemo(() => {
-    if (!data || data.length === 0) return 0;
-    return Math.ceil(data.length / ITEMS_PER_PAGE);
-  }, [data]);
+  const {
+    pageIndex,
+    totalPages,
+    paginatedData,
+    handlePrev,
+    handleNext,
+  } = useGridNavigation(data, isFiltered);
 
   return (
     <section className="w-full flex flex-col items-center">
@@ -53,7 +30,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
           {totalPages > 1 && (
             <>
               <button
-                onClick={() => setPageIndex((prev) => Math.max(0, prev - 1))}
+                onClick={handlePrev}
                 disabled={pageIndex === 0}
                 className="absolute top-1/2 -left-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="이전 페이지"
@@ -62,9 +39,7 @@ const GridContainer = ({ isFiltered }: GridContainerProps) => {
               </button>
 
               <button
-                onClick={() =>
-                  setPageIndex((prev) => Math.min(totalPages - 1, prev + 1))
-                }
+                onClick={handleNext}
                 disabled={pageIndex === totalPages - 1}
                 className="absolute top-1/2 -right-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center disabled:invisible opacity-70 hover:opacity-100 transition-opacity cursor-pointer"
                 aria-label="다음 페이지"

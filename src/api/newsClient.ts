@@ -2,7 +2,7 @@ const BASE_URL = "https://news-worker.forhyundaisofteer.workers.dev";
 
 type RequestOptions = RequestInit;
 
-async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+export const requestApi = async <T>(url: string, options: RequestOptions = {}): Promise<T> => {
   const fullUrl = url.startsWith("http") ? url : `${BASE_URL}${url}`;
 
   const response = await fetch(fullUrl, {
@@ -40,17 +40,17 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
 
 export const httpClient = {
   get: <T>(url: string, options?: RequestOptions) =>
-    request<T>(url, { ...options, method: "GET" }),
+    requestApi<T>(url, { ...options, method: "GET" }),
   post: <T>(url: string, body?: unknown, options?: RequestOptions) =>
-    request<T>(url, {
+    requestApi<T>(url, {
       ...options,
       method: "POST",
       body: JSON.stringify(body),
     }),
   delete: <T>(url: string, options?: RequestOptions) =>
-    request<T>(url, { ...options, method: "DELETE" }),
+    requestApi<T>(url, { ...options, method: "DELETE" }),
   put: <T>(url: string, body?: unknown, options?: RequestOptions) =>
-    request<T>(url, {
+    requestApi<T>(url, {
       ...options,
       method: "PUT",
       body: JSON.stringify(body),
