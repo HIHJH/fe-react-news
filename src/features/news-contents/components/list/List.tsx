@@ -21,11 +21,8 @@ const List = ({
   onPrev,
   pressData,
 }: ListViewProps) => {
-  // Removed unused currentCategory variable
-
   return (
     <div className="w-full border border-default bg-surface-default relative">
-      {/* Category Tabs */}
       <div className="flex border-b border-default bg-surface-alt w-full overflow-x-auto scrollbar-hide">
         {categories.map((cat, idx) => {
           const isActive = idx === currentCategoryIndex;
@@ -85,14 +82,12 @@ const List = ({
               <span className="text-default text-xs">
                 {pressData.regDate} 편집
               </span>
-              <button className="btn-outline rounded-full text-xs px-3 py-1 hover:bg-surface-alt transition-colors">
+              <button className="btn-outline cursor-pointer rounded-full text-xs px-3 py-1 hover:bg-surface-alt transition-colors">
                 + 구독하기
               </button>
             </div>
 
-            {/* Articles Grid */}
             <div className="flex gap-6 h-full">
-              {/* Main Article (Left) */}
               <div className="w-[40%] flex flex-col gap-3 cursor-pointer group">
                 {pressData.materials[0] && (
                   <div
@@ -122,7 +117,6 @@ const List = ({
                 )}
               </div>
 
-              {/* Sub Articles (Right) */}
               <div className="w-[60%] flex flex-col justify-between">
                 <ul className="flex flex-col gap-3">
                   {pressData.materials.slice(1, 7).map((article) => (
@@ -152,7 +146,6 @@ const List = ({
         )}
       </div>
 
-      {/* Navigation Buttons from GridContainer */}
       <button
         onClick={onPrev}
         className="absolute top-1/2 -left-[72px] -translate-y-1/2 w-6 h-10 flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity cursor-pointer"

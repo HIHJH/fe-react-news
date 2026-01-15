@@ -35,7 +35,7 @@ const Grid = ({ data }: GridProps) => {
         return (
           <div
             key={news.pid}
-            className="group relative flex items-center justify-center bg-white hover:bg-gray-100 cursor-pointer overflow-hidden"
+            className="group relative flex items-center justify-center bg-white hover:bg-gray-100 overflow-hidden"
           >
             <img
               src={news.logoLight}
@@ -47,7 +47,7 @@ const Grid = ({ data }: GridProps) => {
                 e.stopPropagation();
                 handleSubscriptionToggle(news.pid, news.isSubscribed);
               }}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-6 flex items-center justify-center gap-0.5 bg-white border border-gray-200 rounded-full text-gray-500 text-xs font-medium opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 hover:bg-gray-50 whitespace-nowrap z-10"
+              className="absolute cursor-pointer top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[72px] h-6 flex items-center justify-center gap-0.5 bg-white border border-gray-200 rounded-full text-gray-500 text-xs font-medium opacity-0 group-hover:opacity-100 group-hover:pointer-events-auto pointer-events-none transition-all duration-200 hover:bg-gray-50 whitespace-nowrap z-10"
               aria-label={news.isSubscribed ? "해지하기" : "구독하기"}
               disabled={isPending}
             >
