@@ -1,6 +1,6 @@
 import type { NewsstandMapData } from "@/features/news-contents/hooks/useCompositeNewsstand";
 import { useSubscriptionToggle } from "@/features/news-contents/hooks/useSubscriptionToggle";
-import SubscriptionButton from "./SubscriptionButton";
+import SubscriptionButton from "@/features/news-contents/components/subscription/SubscriptionButton";
 
 type GridItem = NewsstandMapData[number];
 

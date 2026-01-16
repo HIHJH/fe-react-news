@@ -1,5 +1,5 @@
 import type { NewsstandPress } from "@/api/api";
-import SubscriptionButton from "@/features/news-contents/components/grid/SubscriptionButton";
+import SubscriptionButton from "@/features/news-contents/components/subscription/SubscriptionButton";
 
 interface ListViewProps {
   pressData?: NewsstandPress;
