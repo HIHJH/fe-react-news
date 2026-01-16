@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNewsstand, useNewsstandPress } from "../../hooks/useNewsstand";
 import { useSubscription } from "../../hooks/useSubscription";
+import { useSubscriptionToggle } from "../../hooks/useSubscriptionToggle";
 import { newsQueryKeys } from "@/api/newsQueryKeys";
 import { httpClient } from "@/api/newsClient";
 import { useListNavigation } from "../../hooks/useListNavigation";
@@ -43,6 +44,12 @@ export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
   } = useListNavigation(displayCategories);
 
   const { data: pressData } = useNewsstandPress(currentPid);
+  const { isPending, handleToggle } = useSubscriptionToggle();
+
+  const isSubscribedPress = useMemo(
+    () => subscriptionData?.pids.includes(pressData?.pid || "") || false,
+    [subscriptionData, pressData]
+  );
 
   useEffect(() => {
     if (nextPid) {
@@ -79,7 +86,12 @@ export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
         onCategoryChange={handleCategoryChange}
         onNext={handleNext}
       />
-      <List pressData={pressData} />
+      <List
+        pressData={pressData}
+        isSubscribed={isSubscribedPress}
+        isPending={isPending}
+        onSubscriptionToggle={handleToggle}
+      />
       <PaginationButtons
         onNext={handleNext}
         onPrev={handlePrev}

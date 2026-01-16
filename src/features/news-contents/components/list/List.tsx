@@ -1,10 +1,19 @@
 import type { NewsstandPress } from "@/api/api";
+import SubscriptionButton from "@/features/news-contents/components/grid/SubscriptionButton";
 
 interface ListViewProps {
   pressData?: NewsstandPress;
+  isSubscribed?: boolean;
+  onSubscriptionToggle?: (pid: string, isSubscribed: boolean) => void;
+  isPending?: boolean;
 }
 
-const List = ({ pressData }: ListViewProps) => {
+const List = ({
+  pressData,
+  isSubscribed,
+  onSubscriptionToggle,
+  isPending,
+}: ListViewProps) => {
   if (!pressData) {
     return (
       <div className="p-6 min-h-[300px] flex flex-col justify-between">
@@ -32,9 +41,14 @@ const List = ({ pressData }: ListViewProps) => {
         )}
 
         <span className="text-default text-xs">{pressData.regDate} 편집</span>
-        <button className="btn-outline cursor-pointer rounded-full text-xs px-3 py-1 hover:bg-surface-alt transition-colors">
-          + 구독하기
-        </button>
+        <SubscriptionButton
+          isSubscribed={isSubscribed || false}
+          isPending={isPending || false}
+          variant="list"
+          onToggle={() =>
+            onSubscriptionToggle?.(pressData.pid, isSubscribed || false)
+          }
+        />
       </div>
 
       <div className="flex gap-6 h-full">
