@@ -4,7 +4,7 @@ import { useNewsstand, useNewsstandPress } from "../../hooks/useNewsstand";
 import { useSubscription } from "../../hooks/useSubscription";
 import { useSubscriptionToggle } from "../../hooks/useSubscriptionToggle";
 import { newsQueryKeys } from "@/api/newsQueryKeys";
-import { httpClient } from "@/api/newsClient";
+import { requestApi } from "@/api/client";
 import { useListNavigation } from "../../hooks/useListNavigation";
 import ListCategoryTab from "@/features/news-contents/components/list/ListCategoryTab";
 import List from "@/features/news-contents/components/list/List";
@@ -55,7 +55,8 @@ export const ListContainer = ({ isSubscribed }: { isSubscribed: boolean }) => {
     if (nextPid) {
       queryClient.prefetchQuery({
         queryKey: newsQueryKeys.newsstandDetail(nextPid),
-        queryFn: () => httpClient.get(`/api/newsstand/${nextPid}`),
+        queryFn: () =>
+          requestApi("GET", "/api/newsstand/{pid}", { pid: nextPid }),
         staleTime: 5 * 60 * 1000,
       });
     }
